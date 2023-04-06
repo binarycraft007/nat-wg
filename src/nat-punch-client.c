@@ -85,8 +85,13 @@ static void read_peers(const char *interface)
 
 static void unbase64(uint8_t dstkey[32], const char *srckey)
 {
-	uint8_t buf[33];
-	if (b64_pton(srckey, buf, 33) != 32) {
+	size_t size = 33;
+	uint8_t buf[size];
+	if (b64_decode(srckey, buf, &size) != 0) {
+		fprintf(stderr, "Could not parse base64 key: %s\n", srckey);
+		exit(EINVAL);
+	}
+	if (size != 32) {
 		fprintf(stderr, "Could not parse base64 key: %s\n", srckey);
 		exit(EINVAL);
 	}
